@@ -155,7 +155,8 @@ def create_bow(sentences: ArrayLike, n_gram: int, vocab: Dict[str, int] = None,
     for sentence in tokens_per_sentence:
         bow_sentence = [0] * len(vocab)
         for token in sentence:
-            bow_sentence[vocab[token]] += 1
+            if token in vocab:
+                bow_sentence[vocab[token]] += 1
         bag_of_words.append(bow_sentence)
     
     return (vocab, bag_of_words)
