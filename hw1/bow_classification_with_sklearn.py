@@ -111,7 +111,13 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
         e.g., [["I", "like", "apples"], ["I", "love", "python3"]] for n_gram == 1
               [["I like", "like apples"], ["I love", "love python3"]] for n_gram == 2 
     """
-    raise NotImplementedError
+    sentences = [[word.lower() for word in sentence.split()] for sentence in sentences]
+    for idx, sentence in enumerate(sentences):
+        n_gramed = []
+        for i in range(len(sentence) - n_gram + 1):
+            n_gramed.append(" ".join(sentence[i:i+n_gram]))
+        sentences[idx] = n_gramed
+    return sentences
 
 
 def create_bow(sentences: ArrayLike, n_gram: int, vocab: Dict[str, int] = None,  
