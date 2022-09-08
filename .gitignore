@@ -1,0 +1,11 @@
+# python
+venv
+__pycache__
+
+# data
+data/
+
+# misc
+.DS_Store
+.vscode
+.env
