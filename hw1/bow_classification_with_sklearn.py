@@ -144,10 +144,21 @@ def create_bow(sentences: ArrayLike, n_gram: int, vocab: Dict[str, int] = None,
 
     if vocab is None:
         print("{} Vocab construction".format(msg_prefix))
-        raise NotImplementedError
+        vocab = {}
+        for sentence in tokens_per_sentence:
+            for token in sentence:
+                if token not in vocab:
+                    vocab[token] = len(vocab)
 
     print("{} Bow construction".format(msg_prefix))
-    raise NotImplementedError
+    bag_of_words = []
+    for sentence in tokens_per_sentence:
+        bow_sentence = [0] * len(vocab)
+        for token in sentence:
+            bow_sentence[vocab[token]] += 1
+        bag_of_words.append(bow_sentence)
+    
+    return (vocab, bag_of_words)
 
 
 def run(test_xs=None, test_ys=None, num_samples=5000, verbose=True, n_gram=1):
