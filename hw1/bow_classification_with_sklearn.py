@@ -111,13 +111,15 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
         e.g., [["I", "like", "apples"], ["I", "love", "python3"]] for n_gram == 1
               [["I like", "like apples"], ["I love", "love python3"]] for n_gram == 2 
     """
-    sentences = [[word.lower() for word in sentence.split()] for sentence in sentences]
-    for idx, sentence in enumerate(sentences):
+    def n_gram_sentence(sentence: ArrayLike, n_gram: int) -> ArrayLike:
         n_gramed = []
-        for i in range(len(sentence) - n_gram + 1):
-            n_gramed.append(" ".join(sentence[i:i+n_gram]))
-        sentences[idx] = n_gramed
-    return sentences
+        for i in range(len(sentence)):
+            if i + n_gram <= len(sentence):
+                n_gramed.append(" ".join(sentence[i : i + n_gram]))
+        return n_gramed
+
+    tokenized = [[word.lower() for word in sentence.split()] for sentence in sentences]
+    return [n_gram_sentence(sentence, n_gram) for sentence in tokenized]
 
 
 def create_bow(sentences: ArrayLike, n_gram: int, vocab: Dict[str, int] = None,  
@@ -140,26 +142,26 @@ def create_bow(sentences: ArrayLike, n_gram: int, vocab: Dict[str, int] = None,
         e.g., ({"I": 0, "like": 1, "apples": 2, "love": 3, "python3": 4}, for n_gram : 1 
                 [[1, 1, 1, 0, 0], [1, 0, 0, 1, 1]])
     """
-    tokens_per_sentence = preprocess_and_split_to_tokens(sentences, n_gram)
+    tokenized = preprocess_and_split_to_tokens(sentences, n_gram)
 
     if vocab is None:
         print("{} Vocab construction".format(msg_prefix))
         vocab = {}
-        for sentence in tokens_per_sentence:
+        for sentence in tokenized:
             for token in sentence:
                 if token not in vocab:
                     vocab[token] = len(vocab)
 
     print("{} Bow construction".format(msg_prefix))
-    bag_of_words = []
-    for sentence in tokens_per_sentence:
+    bow_array = []
+    for sentence in tokenized:
         bow_sentence = [0] * len(vocab)
         for token in sentence:
             if token in vocab:
                 bow_sentence[vocab[token]] += 1
-        bag_of_words.append(bow_sentence)
+        bow_array.append(bow_sentence)
     
-    return (vocab, bag_of_words)
+    return (vocab, bow_array)
 
 
 def run(test_xs=None, test_ys=None, num_samples=5000, verbose=True, n_gram=1):
