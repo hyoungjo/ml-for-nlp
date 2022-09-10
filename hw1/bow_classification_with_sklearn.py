@@ -113,9 +113,9 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
     """
     def n_gram_sentence(sentence: ArrayLike, n_gram: int) -> ArrayLike:
         n_gramed = []
-        for i in range(len(sentence)):
-            if i + n_gram <= len(sentence):
-                n_gramed.append(" ".join(sentence[i : i + n_gram]))
+        for i in range(len(sentence) - (n_gram - 1)):
+            ith_n_gram = sentence[i : i + n_gram]
+            n_gramed.append(" ".join(ith_n_gram))
         return n_gramed
 
     tokenized = [[word.lower() for word in sentence.split()] for sentence in sentences]
