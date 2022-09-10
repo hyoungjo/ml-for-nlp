@@ -115,10 +115,20 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
         n_gramed = []
         for i in range(len(sentence) - (n_gram - 1)):
             ith_n_gram = sentence[i : i + n_gram]
-            n_gramed.append(" ".join(ith_n_gram))
+            if '<br />' not in ith_n_gram:
+                n_gramed.append(" ".join(ith_n_gram))
         return n_gramed
 
-    tokenized = [[word.lower() for word in sentence.split()] for sentence in sentences]
+    tokenized = []
+    for review in sentences:
+        pattern = r"<br \/>|\.+|,+|\?+|!+|\(+|\)+"
+        review = [phrase.split() for phrase in re.split(pattern, review) if phrase]
+        tokenized_review = []
+        for phrase in review:
+            tokenized_review.extend([token.lower() for token in phrase])
+            tokenized_review.append('<br />')
+        tokenized.append(tokenized_review)
+
     return [n_gram_sentence(sentence, n_gram) for sentence in tokenized]
 
 
