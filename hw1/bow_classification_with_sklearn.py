@@ -118,15 +118,22 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
             n_gramed.append(" ".join(ith_n_gram))
         return n_gramed
 
+    def process_token(token: str) -> str:
+        if token.startswith('"') or token.startswith("'"):
+            token = token[1:]
+        if token.endswith('"') or token.endswith("'"):
+            token = token[:-1]
+        return token.lower()
+
     def process_phrase(phrase: list, n_gram: int) -> str:
         stopwords = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', "aren't", 'couldn', "couldn't", 'didn', "didn't", 'doesn', "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"]
-        return [token.lower() for token in phrase if token not in stopwords] \
+        return [process_token(token) for token in phrase if token not in stopwords] \
             if n_gram == 1 \
-            else [token.lower() for token in phrase]
+            else [process_token(token) for token in phrase]
 
     tokenized = []
     for review in sentences:
-        pattern = r"<br \/>|\.+|,+|\?+|!+|\(+|\)+|--+"
+        pattern = r"<br \/>|\.+|,+|\?+|!+|\(+|\)+|--+| ?- | - ?"
         review = [phrase.split() for phrase in re.split(pattern, review) if phrase]
         tokenized_review = []
         for phrase in review:
