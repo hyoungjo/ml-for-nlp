@@ -115,8 +115,7 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
         n_gramed = []
         for i in range(len(sentence) - (n_gram - 1)):
             ith_n_gram = sentence[i : i + n_gram]
-            if '<br />' not in ith_n_gram:
-                n_gramed.append(" ".join(ith_n_gram))
+            n_gramed.append(" ".join(ith_n_gram))
         return n_gramed
 
     tokenized = []
