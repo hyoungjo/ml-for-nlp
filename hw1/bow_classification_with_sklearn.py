@@ -118,20 +118,13 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
             n_gramed.append(" ".join(ith_n_gram))
         return n_gramed
 
-    def process_token(token: str) -> str:
-        if token.startswith('"') or token.startswith("'"):
-            token = token[1:]
-        if token.endswith('"') or token.endswith("'"):
-            token = token[:-1]
-        return token.lower()
-
     tokenized = []
     for review in sentences:
-        pattern = r"<br \/>|\.+|,+|\?+|!+|\(+|\)+|--+| ?- | - ?"
+        pattern = r"<br \/>|\.+|,+|\?+|!+|\(+|\)+|--+"
         review = [phrase.split() for phrase in re.split(pattern, review) if phrase]
         tokenized_review = []
         for phrase in review:
-            tokenized_review.extend([process_token(token) for token in phrase])
+            tokenized_review.extend([token.lower() for token in phrase])
             tokenized_review.append('<br />')
         tokenized.append(tokenized_review)
 
