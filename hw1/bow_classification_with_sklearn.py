@@ -120,7 +120,7 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
 
     tokenized = []
     for review in sentences:
-        pattern = r"<br \/>|\.+|,+|\?+|!+|\(+|\)+|--+"
+        pattern = r"<br \/>|\.+|,+|\?+|!+|\(+|\)+|;|--+| - "
         review = [phrase.split() for phrase in re.split(pattern, review) if phrase]
         tokenized_review = []
         for phrase in review:
