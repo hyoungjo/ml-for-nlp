@@ -126,7 +126,7 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
     def process_phrase(phrase, n_gram):
         phrase = [process_token(token) for token in phrase]
         if n_gram == 1:
-            phrase = [token for token in phrase if token not in stopwords]
+            phrase = [token for token in phrase if token and token not in stopwords]
         return phrase
 
     def process_token(token):
@@ -139,7 +139,10 @@ def preprocess_and_split_to_tokens(sentences: ArrayLike, n_gram: int) -> ArrayLi
         review = [phrase.split() for phrase in re.split(pattern, review) if phrase]
         tokenized_review = []
         for phrase in review:
-            tokenized_review.extend(process_phrase(phrase, n_gram))
+            phrase = process_phrase(phrase, n_gram)
+            if not phrase: 
+                continue
+            tokenized_review.extend(phrase)
             tokenized_review.append('<br />')
         tokenized.append(tokenized_review)
 
