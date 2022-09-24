@@ -146,7 +146,6 @@ class RNN(nn.Module):
         super().__init__()
         self.embedding = nn.Embedding(num_embeddings, embedding_dim, padding_idx = padding_idx)
         self.dropout = nn.Dropout(dropout)
-        
 
         ## build your own RNN module and fully connected (fc) layer
         ## * self.rnn
@@ -154,14 +153,12 @@ class RNN(nn.Module):
         ##         - Example: self.rnn = nn.GRU(...., batch_first=True, ...)
         ## * self.fc
         ##         - The structure of fully connected (fc) layer can vary depending on the output of your RNN module
+        ##         - Hint: nn.Linear(/* BLANK */, 1)
 
-        ########### IMPLEMENT HERE ###############
-        self.rnn: nn.Module = None     # Example: nn.GRU(...., batch_first=True, ...)
-        self.fc: nn.Module = None      # Hint: nn.Linear(/* BLANK */, 1)
+        self.rnn: nn.Module = nn.GRU(input_size = embedding_dim, hidden_size = hidden_dim, num_layers = num_layers,
+                                     batch_first = True)  # bidirectional = bidirectional
+        self.fc = nn.Linear(hidden_dim, 1)
 
-        raise NotImplementedError
-        ##########################################
-        
         
     def forward(self, text, text_lengths):
         
@@ -180,15 +177,14 @@ class RNN(nn.Module):
         ##      - the text length need to be on CPU
 
         packed_embedded = pack_padded_sequence(embedded, text_lengths.to('cpu'), batch_first = True)
-        
 
         ## build your own RNN structure using self.rnn, self.fc
         ## You don't need to use self.dropout. It is optional.
-        ########### IMPLEMENT HERE ###############
-        output: torch.Tensor = None
-        
-        raise NotImplementedError
-        ##########################################
+        ## output: torch.Tensor
+
+        _, hidden = self.rnn(packed_embedded)
+        output = self.fc(hidden)
+        output = torch.squeeze(output)
 
         assert output.shape == torch.Size([text.shape[0]]) # batch_size
         return output
@@ -215,12 +211,13 @@ def train(model, iterator, optimizer, criterion):
         (text, text_lengths), labels = batch.review, batch.sentiment
         
         ## Complete train method using model(), criterion(), accuracy()
-        ########### IMPLEMENT HERE ###############
-        loss:torch.Tensor = None
-        acc:torch.Tensor = None
+        ## loss, acc: torch.Tensor
 
-        raise NotImplementedError
-        ##########################################
+        logit = model(text, text_lengths)
+        loss = criterion(logit, labels)
+        acc = accuracy (logit, labels)
+        loss.backward()
+        optimizer.step()
 
         assert loss.shape == torch.Size([])
         assert acc.shape == torch.Size([])
@@ -252,16 +249,13 @@ def evaluate(model, iterator, criterion):
             (text, text_lengths), labels = batch.review, batch.sentiment
 
             ## Complete evaluate method using model(), criterion(), accuracy()
-            ########### IMPLEMENT HERE ###############
-            loss:torch.Tensor = None
-            acc:torch.Tensor = None
 
-            raise NotImplementedError
-            ##########################################
+            logit = model(text, text_lengths)
+            loss = criterion(logit, labels)
+            acc = accuracy (logit, labels)
 
             assert loss.shape == torch.Size([])
             assert acc.shape == torch.Size([])
-
 
             total_epoch_loss += loss.item()
             total_epoch_acc += acc.item()
