@@ -274,11 +274,11 @@ def set_hyperparameter_dict():
         'embedding_dim': 32,
         'hidden_dim': 32,
         'num_layers': 1,
-        'dropout': 0.0,
+        'dropout': 0.5,
         'bidirectional': True, 
         'batch_size': 32,
         'num_epochs': 10,
-        'learning_rate': 1e-3,
+        'learning_rate': 6e-3,
         'device':'cuda'
     }
     return param_dict
