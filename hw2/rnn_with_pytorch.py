@@ -158,8 +158,9 @@ class RNN(nn.Module):
         self.rnn: nn.Module = nn.GRU(input_size = embedding_dim, hidden_size = hidden_dim, num_layers = num_layers,
                                      batch_first = True)  # bidirectional = bidirectional
         self.fc = nn.Linear(hidden_dim, 1)
+        self.num_layers = num_layers
 
-        
+
     def forward(self, text, text_lengths):
         
         ## text.shape = [batch size, max text length, embedding_dim]
@@ -182,9 +183,9 @@ class RNN(nn.Module):
         ## You don't need to use self.dropout. It is optional.
         ## output: torch.Tensor
 
-        _, hidden = self.rnn(packed_embedded)
+        packed_output, hidden = self.rnn(packed_embedded)
         output = self.fc(hidden)
-        output = torch.squeeze(output)
+        output = torch.squeeze(output[self.num_layers - 1, :, :])
 
         assert output.shape == torch.Size([text.shape[0]]) # batch_size
         return output
