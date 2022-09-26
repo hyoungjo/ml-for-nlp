@@ -214,9 +214,9 @@ def train(model, iterator, optimizer, criterion):
         ## Complete train method using model(), criterion(), accuracy()
         ## loss, acc: torch.Tensor
 
-        logit = model(text, text_lengths)
-        loss = criterion(logit, labels)
-        acc = accuracy (logit, labels)
+        prediction = model(text, text_lengths)
+        loss = criterion(prediction, labels)
+        acc = accuracy (prediction, labels)
         loss.backward()
         optimizer.step()
 
@@ -251,9 +251,9 @@ def evaluate(model, iterator, criterion):
 
             ## Complete evaluate method using model(), criterion(), accuracy()
 
-            logit = model(text, text_lengths)
-            loss = criterion(logit, labels)
-            acc = accuracy (logit, labels)
+            prediction = model(text, text_lengths)
+            loss = criterion(prediction, labels)
+            acc = accuracy (prediction, labels)
 
             assert loss.shape == torch.Size([])
             assert acc.shape == torch.Size([])
