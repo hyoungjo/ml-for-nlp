@@ -25,10 +25,14 @@ class MeanMaxTokensBertPooler(nn.Module):
 class MyBertPooler(nn.Module):
     def __init__(self, config):
         super().__init__()
-        raise NotImplementedError
+        self.weights = nn.Linear(config.hidden_size, config.hidden_size)
+        self.activation = nn.Tanh()
 
     def forward(self, hidden_states, *args, **kwargs):
-        raise NotImplementedError
+        hidden_sum = torch.sum(hidden_states, 1) / hidden_states.size(1)
+        pooled = self.weights(hidden_sum)
+        pooled = self.activation(pooled)
+        return pooled
 
 
 class MyBertConfig(BertConfig):
