@@ -29,8 +29,8 @@ class MyBertPooler(nn.Module):
         self.activation = nn.Tanh()
 
     def forward(self, hidden_states, *args, **kwargs):
-        hidden_mean = torch.sum(hidden_states, 1) / hidden_states.size(1)
-        pooled = self.weights(hidden_mean)
+        hidden_max, _ = torch.max(hidden_states, 1)
+        pooled = self.weights(hidden_max)
         pooled = self.activation(pooled)
         return pooled
 
