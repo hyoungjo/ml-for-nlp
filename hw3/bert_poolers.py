@@ -22,6 +22,7 @@ class MeanMaxTokensBertPooler(nn.Module):
         return pooled
 
 
+# TopKMeanBertPooler
 class MyBertPooler(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -29,7 +30,8 @@ class MyBertPooler(nn.Module):
         self.activation = nn.Tanh()
 
     def forward(self, hidden_states, *args, **kwargs):
-        top_k, _ = torch.topk(hidden_states, 20, dim=1)
+        k = 20  # 10, 20, 30, hidden_states.shape[1] // 2
+        top_k, _ = torch.topk(hidden_states, k, dim=1)
         top_k_mean = torch.sum(top_k, 1) / top_k.size(1)
         pooled = self.weights(top_k_mean)
         pooled = self.activation(pooled)
@@ -57,8 +59,15 @@ class MyBertModel(BertModel):
             self.pooler = BertPooler(config)
         elif config.pooling_layer_type == "MEAN_MAX":
             self.pooler = MeanMaxTokensBertPooler(config)
-        elif config.pooling_layer_type == "MINE":
-            self.pooler = MyBertPooler(config)
+        elif config.pooling_layer_type == "TOPK_MEAN":
+            self.pooler = TopKMeanBertPooler(config)
+        elif config.pooling_layer_type == "TOPHALF_MEAN":
+            self.pooler = TopHalfMeanBertPooler(config)
+        elif config.pooling_layer_type == "MEAN_CLS":
+            self.pooler = MeanCLSBertPooler(config)
+        elif config.pooling_layer_type == "TOPK_MEAN_CLS":
+            self.pooler = TopKMeanCLSBertPooler(config)
+        
         else:
             raise ValueError(f"Wrong pooling_layer_type: {config.pooling_layer_type}")
 
@@ -93,10 +102,8 @@ class MyBertForSequenceClassification(BertForSequenceClassification):
             output_hidden_states=None,
             return_dict=None,
     ):
-        if self.bert.pooling_layer_type in ["CLS", "MEAN_MAX"]:
-            return super().forward(
-                input_ids, attention_mask, token_type_ids, position_ids, head_mask,
-                inputs_embeds, labels, output_attentions, output_hidden_states, return_dict
-            )
-        else:
-            raise NotImplementedError
+        return super().forward(
+            input_ids, attention_mask, token_type_ids, position_ids, head_mask,
+            inputs_embeds, labels, output_attentions, output_hidden_states, return_dict
+        )
+        
