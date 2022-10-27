@@ -4,8 +4,11 @@ Starter Code for CS475 HW4: Ethnic Bias in Language Models.
 """
 import math
 from pprint import pprint
+from pattern.en import pluralize
 from transformers import pipeline, AutoTokenizer, AutoModelForMaskedLM
 
+import nltk
+nltk.download('omw-1.4')
 
 # You can use model checkpoint other than "bert-base-cased"
 # See: https://huggingface.co/models for the available models that you can easily use.
@@ -19,8 +22,11 @@ targets = [
     "Thailand", "Australia", "Spain", "Turkey", "Israel", "Italy", "Egypt", "Somalia",
     "India", "Brazil", "Colombia", "Greece", "Afghanistan", "Cuba", "Syria"
 ]
-attributes = ['enemy', 'spy']
-templates = ["A person from [MASK] is an [ATTR].", "People from [MASK] is [ATTR]."]
+
+with open('data/occ_en.txt', 'r') as f:
+  attributes = f.readlines()
+with open('data/templates_en.txt', 'r') as f:
+  templates = f.readlines()
 
 # For more documentation of fill-mask pipeline, please refer to: 
 # https://huggingface.co/docs/transformers/v4.23.1/en/main_classes/pipelines
@@ -28,12 +34,19 @@ templates = ["A person from [MASK] is an [ATTR].", "People from [MASK] is [ATTR]
 classifier = pipeline("fill-mask", model=model, tokenizer=tokenizer, targets=targets)
 cb_score = 0
 
+
+def replace_template(template, token):
+  # token is either "[MASK]" or "attribute"
+  template = template.replace("[TTT]", "[MASK]")
+  return template.replace("[AAA]", token) if "[AAA]" in template else template.replace("[AAAs]", pluralize(token))
+
+
 for template in templates:
-  prior_sentence = template.replace("[ATTR]", "[MASK]")
+  prior_sentence = replace_template(template, "[MASK]")
   prior_prediction = classifier(prior_sentence, top_k=len(targets))[0]
   sorted_prior = sorted(prior_prediction, key=lambda x: x['token_str'])
 
-  target_sentences = [template.replace("[ATTR]", attribute) for attribute in attributes]
+  target_sentences = [replace_template(template, attribute) for attribute in attributes]
 
   for target_sentence in target_sentences:
     print(f"prior_sentence: {prior_sentence}\ntarget_sentence: {target_sentence}")
@@ -57,4 +70,5 @@ for template in templates:
     cb_score += variance
     print(f"variance: {variance}")
 
+cb_score = cb_score / len(templates) / len(attributes)
 print(f"cb_socre: {cb_score}")
