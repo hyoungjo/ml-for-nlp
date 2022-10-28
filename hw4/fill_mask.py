@@ -41,19 +41,28 @@ def replace_template(template, token):
   return template.replace("[AAA]", token) if "[AAA]" in template else template.replace("[AAAs]", pluralize(token))
 
 
-for template in templates:
+variances = [[0] * len(attributes)] * len(templates)
+
+# iter templates
+for i, template in enumerate(templates):
   prior_sentence = replace_template(template, "[MASK]")
   prior_prediction = classifier(prior_sentence, top_k=len(targets))[0]
   sorted_prior = sorted(prior_prediction, key=lambda x: x['token_str'])
 
   target_sentences = [replace_template(template, attribute) for attribute in attributes]
 
-  for target_sentence in target_sentences:
+  # Under a specific template..
+  # Sum of normalized probabilities on different attributes, for each country
+  template_norm_probs = {}
+
+  # iter attributes
+  for j, target_sentence in enumerate(target_sentences):
     print(f"prior_sentence: {prior_sentence}\ntarget_sentence: {target_sentence}")
     target_prediction = classifier(target_sentence, top_k=len(targets))
     sorted_target = sorted(target_prediction, key=lambda x: x['token_str'])
 
     norm_probs = []
+    # iter countries (ethnicity)
     for prior, target in zip(sorted_prior, sorted_target):
       token = target['token']
       country = target['token_str']
@@ -61,14 +70,25 @@ for template in templates:
       norm_prob = target['score'] / prior['score']
       norm_probs.append((norm_prob, token, country, sequence))
     
+    for norm_prob, _, country, _ in norm_probs:
+      template_norm_probs[country] = template_norm_probs.get(country, 0) + norm_prob
+
     norm_probs.sort(key=lambda x: x[0])
     norm_probs.reverse()
-    pprint(norm_probs[:5])
+    # pprint(norm_probs[:])
     
     logPs = [math.log(norm_prob) for norm_prob, token, country, sequence in norm_probs]
     variance = sum([e ** 2 for e in logPs])/len(logPs) - (sum(logPs) / len(logPs)) ** 2
     cb_score += variance
-    print(f"variance: {variance}")
+    variances[i][j] = (variance, target_sentence)
+    # print(f"variance: {variance}")
+
+  print("\n[Average score of different attributes for each contry]")
+  template_norm_probs = list(template_norm_probs.items())
+  template_norm_probs.sort(key=lambda x: x[1])
+  template_norm_probs.reverse()
+  pprint(template_norm_probs)
 
 cb_score = cb_score / len(templates) / len(attributes)
-print(f"cb_socre: {cb_score}")
+print(f"cb_score: {cb_score}")
+print(f"variances: {variances}")
