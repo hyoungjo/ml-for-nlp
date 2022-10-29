@@ -1,3 +1,5 @@
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch==1.7.1+cu110
 transformers==4.23.1
+pattern==3.6
+nltk==3.7
