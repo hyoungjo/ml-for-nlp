@@ -101,7 +101,7 @@ def replace_template(template, token):
   return template.replace("[AAA]", token) if "[AAA]" in template else template.replace("[AAAs]", pluralize(token))
 
 
-variances = [[0] * len(attributes)] * len(templates)
+variances = [[0] * len(attributes) for _ in templates]
 
 # iter templates
 for i, template in enumerate(templates):
