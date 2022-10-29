@@ -152,3 +152,13 @@ for i, template in enumerate(templates):
 cb_score = cb_score / len(templates) / len(attributes)
 print(f"cb_score: {cb_score}")
 print(f"variances: {variances}")
+
+print("\n[Average score of different templates for each attribute]")
+for attribute_idx, attribute in enumerate(attributes):
+  print(f"Attribute: {attribute}")
+  variances_avg = 0
+  for template_list in variances:
+    variance, target_sentence = template_list[attribute_idx]
+    variances_avg += variance
+  variances_avg = variances_avg / len(templates)
+  print(f"Average variances: {variances_avg}")
