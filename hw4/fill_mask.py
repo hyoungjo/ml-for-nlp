@@ -1,32 +1,92 @@
 """
 Starter Code for CS475 HW4: Ethnic Bias in Language Models.
 !!! Warning !!! Some model outputs may be offensive or upsetting.
+
+Below can also be found in Colab: https://colab.research.google.com/drive/1BWluZr3Kh4lHxFjOfX9g1Xjl96c9wYgL?usp=sharing
 """
 import math
 from pprint import pprint
-from pattern.en import pluralize
 from transformers import pipeline, AutoTokenizer, AutoModelForMaskedLM
 
 import nltk
 nltk.download('omw-1.4')
 
+LANG = "EN"  # "ES"
+
+if LANG == "EN":
+  from pattern.en import pluralize
+elif LANG == "ES":
+  from pattern.es import pluralize
+
 # You can use model checkpoint other than "bert-base-cased"
 # See: https://huggingface.co/models for the available models that you can easily use.
-tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
-model = AutoModelForMaskedLM.from_pretrained("bert-base-cased")
+
+if LANG == "EN":
+  tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+  model = AutoModelForMaskedLM.from_pretrained("bert-base-cased")
+elif LANG == "ES":
+  tokenizer = AutoTokenizer.from_pretrained("dccuchile/bert-base-spanish-wwm-uncased")
+  model = AutoModelForMaskedLM.from_pretrained("dccuchile/bert-base-spanish-wwm-uncased")
 
 # You can try out different targets, attribute, and/or template for your exploration
-targets = [
-    "America", "Canada", "Japan", "China", "Korea", "England", "France",
-    "Germany", "Mexico", "Iraq", "Ireland", "Iran", "Saudi", "Russia", "Vietnam",
-    "Thailand", "Australia", "Spain", "Turkey", "Israel", "Italy", "Egypt", "Somalia",
-    "India", "Brazil", "Colombia", "Greece", "Afghanistan", "Cuba", "Syria"
-]
 
-with open('data/occ_en.txt', 'r') as f:
-  attributes = f.readlines()
-with open('data/templates_en.txt', 'r') as f:
-  templates = f.readlines()
+# Countries from the original paper.
+
+# targets = [
+#   "America", "Canada", "Japan", "China", "Korea", "England", "France",
+#   "Germany", "Mexico", "Iraq", "Ireland", "Iran", "Saudi", "Russia", "Vietnam",
+#   "Thailand", "Australia", "Spain", "Turkey", "Israel", "Italy", "Egypt", "Somalia",
+#   "India", "Brazil", "Colombia", "Greece", "Afghanistan", "Cuba", "Syria"
+# ]
+# targets = [
+#   "América", "Canadá", "Japón", "China", "Corea", "Inglaterra", "Francia",
+#   "Alemania", "México", "Iraq", "Irlanda", "Irán", "Arabia Saudita", "Rusia", "Vietnam",
+#   "Tailandia", "Australia", "España", "Turquía", "Israel", "Italia", "Egipto", "Somalia",
+#   "India", "Brasil", "Colombia", "Grecia", "Afganistán", "Cuba", "Siria"
+# ]
+
+# Countries for our experiment (N countries for each religion)
+# Christianity, Muslim, Hinduism, Buddism
+
+if LANG == "EN":
+  targets = [
+    "Korea", "Japan", "India", "Bangladesh", "Indonesia", "America", 
+    "Israel", "Mexico", "Brazil", "Greece", "Colombia", "Russia", "Philippines", 
+    "Paraguay", "Nigeria", "China", "Congo", "Germany", "Ethiopia", "Iran", 
+    "Iraq", "Syria", "Turkey", "Afghanistan", "Egypt", "Algeria", "Pakistan", 
+    "Qatar", "Morocco", "Saudi", "Somalia", "Nepal", 
+    "Pakistan", "Malaysia", "Myanmar", "Cambodia", "Mongolia", 
+    "China", "Thailand", "Singapore"
+  ]
+elif LANG == "ES":
+  targets = [
+    "Corea", "Japón", "India", "Bangladesh", "Indonesia", "América",
+    "Israel", "México", "Brasil", "Grecia", "Colombia", "Rusia", "Filipinas",
+    "Paraguay", "Nigeria", "China", "Congo", "Alemania", "Etiopía", "Irán",
+    "Irak", "Siria", "Turquía", "Afganistán", "Egipto", "Argelia", "Pakistán",
+    "Qatar", "Marruecos", "Saudita", "Somalia", "Nepal",
+    "Pakistán", "Malasia", "Myanmar", "Camboya", "Mongolia",
+    "China", "Tailandia", "Singapur"
+  ]
+# "Sri Lanka", "Gambia", "Azerbaizán", "Bután", "Laos", 
+
+# Attributes
+attr_type = "religion"  # "occ", "religion"
+if LANG == "EN":
+  with open(f'{attr_type}_en.txt', 'r') as f:
+    attributes = f.readlines()
+elif LANG == "ES":
+  with open(f'{attr_type}_es.txt', 'r') as f:
+    attributes = f.readlines()
+
+# Templates
+if LANG == "EN":
+  with open('templates_en.txt', 'r') as f:
+    templates = f.readlines()
+elif LANG == "ES":
+  with open('templates_es.txt', 'r') as f:
+    templates = f.readlines()
+
 
 # For more documentation of fill-mask pipeline, please refer to: 
 # https://huggingface.co/docs/transformers/v4.23.1/en/main_classes/pipelines
