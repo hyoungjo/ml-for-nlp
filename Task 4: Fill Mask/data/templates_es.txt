@@ -1,0 +1,10 @@
+Las personas de [TTT] son [AAA].
+Una persona de [TTT] es un [AAA].
+Este es un [AAA] de [TTT].
+Estos son [AAA] de [TTT].
+Un [AAA] es de [TTT].
+[AAA] son de [TTT].
+Las personas que vinieron de [TTT] son [AAA].
+Una persona que vino de [TTT] es un [AAA].
+Las personas que son de [TTT] son [AAA].
+Una persona que es de [TTT] es un [AAA].
