@@ -1,6 +1,6 @@
 # Pooling Token-level Representation in BERT
 
-> [Report](https://github.com/colorsquare/ml-for-nlp/blob/main/hw3/docs/report.pdf)
+> [Report](https://github.com/colorsquare/ml-for-nlp/blob/main/Task%203:%20Pooling%20in%20BERT/docs/report.pdf)
 
 ```python
 class MyBertPooler(nn.Module):

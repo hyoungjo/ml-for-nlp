@@ -1,6 +1,6 @@
 # Explore Bias in Language Models with Fill Mask
 
-> [Report](https://github.com/colorsquare/ml-for-nlp/blob/main/hw4/docs/report.pdf)
+> [Report](https://github.com/colorsquare/ml-for-nlp/blob/main/Task%204:%20Fill%20Mask/docs/report.pdf)
 
 Review a paper, *Ahn & Oh, Mitigating Language-Dependent Ethnic Bias in BERT (EMNLP 2021)*.  
 Using fill-mask, explore biases in BERT models of different languages.
