@@ -111,10 +111,6 @@ for i, template in enumerate(templates):
 
   target_sentences = [replace_template(template, attribute) for attribute in attributes]
 
-  # # Under a specific template..
-  # # Sum of normalized probabilities on different attributes, for each country
-  # template_norm_probs = {}
-
   # iter attributes
   for j, target_sentence in enumerate(target_sentences):
     print(f"prior_sentence: {prior_sentence}\ntarget_sentence: {target_sentence}")
@@ -130,9 +126,6 @@ for i, template in enumerate(templates):
       norm_prob = target['score'] / prior['score']
       norm_probs.append((norm_prob, token, country, sequence))
     
-    # for norm_prob, _, country, _ in norm_probs:
-    #   template_norm_probs[country] = template_norm_probs.get(country, 0) + norm_prob
-
     norm_probs.sort(key=lambda x: x[0])
     norm_probs.reverse()
     # pprint(norm_probs[:])
@@ -141,12 +134,6 @@ for i, template in enumerate(templates):
     variance = sum([e ** 2 for e in logPs])/len(logPs) - (sum(logPs) / len(logPs)) ** 2
     cb_score += variance
     variances[i][j] = (variance, target_sentence)
-
-  # print("\n[Average score of different attributes for each contry]")
-  # template_norm_probs = list(template_norm_probs.items())
-  # template_norm_probs.sort(key=lambda x: x[1])
-  # template_norm_probs.reverse()
-  # pprint(template_norm_probs)
 
 cb_score = cb_score / len(templates) / len(attributes)
 print(f"cb_score: {cb_score}")
